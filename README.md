@@ -136,7 +136,7 @@ A handy, stylish list of the **most useful Docker commands** you'll use for cont
 
 ---
 
-## 🚀 Compose (Bonus)
+## 🚀 Compose
 
 | Command | Description |
 |--------|-------------|
