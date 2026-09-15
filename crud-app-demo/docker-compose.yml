@@ -1,0 +1,37 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: php_crud_demo
+      DB_USER: crud_user 
+      DB_PASS: crud_pass #Do not hardcode DB credentials, you can use environment variables in local setup, parameter store or secrets manager to maintain on AWS, can make use config map and secrets on kubernetes.
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root_pass #Do not hardcode DB credentials, you can use environment variables in local setup, parameter store or secrets manager to maintain on AWS, can make use config map and secrets on kubernetes.
+      MYSQL_DATABASE: php_crud_demo
+      MYSQL_USER: crud_user
+      MYSQL_PASSWORD: crud_pass #Do not hardcode DB credentials, you can use environment variables in local setup, parameter store or secrets manager to maintain on AWS, can make use config map and secrets on kubernetes.
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot_pass"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  db_data:
